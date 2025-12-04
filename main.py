@@ -11,7 +11,7 @@ app = FastAPI()
 # -------------------------
 # MongoDB Connection
 # -------------------------
-MONGODB_URI = os.getenv("MONGO_URI")  # make sure Render uses this name
+MONGODB_URI = os.getenv("MONGODB_URI") # make sure Render uses this name
 DB_NAME = "emogo_db"
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
