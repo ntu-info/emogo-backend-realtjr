@@ -8,7 +8,8 @@ app = FastAPI()
 # -------------------------
 # MongoDB 連線設定（從環境變數讀取）
 # -------------------------
-MONGODB_URI = os.getenv("MONGO_URI")
+MONGODB_URI = "mongodb+srv://anna23qq_db_user:NtzrnGfv8ay2UJ1v@cluster0.gfssdel.mongodb.net/"
+
 DB_NAME = "emogo_db"
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
