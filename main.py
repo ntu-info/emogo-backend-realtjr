@@ -6,44 +6,43 @@ import os
 app = FastAPI()
 
 # -------------------------
-# MongoDB 連線設定（從環境變數讀取）
+# MongoDB Connection
 # -------------------------
 MONGODB_URI = os.getenv("MONGODB_URI")
-
 DB_NAME = "emogo_db"
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 db = client[DB_NAME]
 
 # -------------------------
-# Pydantic Model
+# Emogo Data Model
 # -------------------------
-class Item(BaseModel):
-    name: str
-    value: int
+class EmogoRecord(BaseModel):
+    emotion: str
+    location: dict
+    timestamp: int
+    video: str   # webm filename
 
 # -------------------------
 # Routes
 # -------------------------
+
 @app.get("/")
 async def root():
-    return {"message": "Hello from FastAPI + MongoDB!"}
+    return {"message": "Hello from FastAPI + Emogo!"}
 
-@app.post("/items")
-async def create_item(item: Item):
-    item_dict = item.dict()
-    result = await db["items"].insert_one(item_dict)
+# 1. Insert Emogo Data
+@app.post("/records")
+async def create_record(record: EmogoRecord):
+    result = await db["records"].insert_one(record.dict())
     return {"inserted_id": str(result.inserted_id)}
 
-@app.get("/items")
-async def get_items():
-    items = []
-    cursor = db["items"].find({})
-    async for document in cursor:
-        document["_id"] = str(document["_id"])
-        items.append(document)
-    return items
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: int):
-    return {"item_id": item_id}
+# 2. Get All Records
+@app.get("/records")
+async def get_records():
+    records = []
+    cursor = db["records"].find({})
+    async for doc in cursor:
+        doc["_id"] = str(doc["_id"])
+        records.append(doc)
+    return records
