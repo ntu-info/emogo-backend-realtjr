@@ -1,13 +1,14 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import motor.motor_asyncio
+import os
 
 app = FastAPI()
 
 # -------------------------
-# MongoDB 連線設定
+# MongoDB 連線設定（從環境變數讀取）
 # -------------------------
-MONGODB_URI = "mongodb+srv://anna23qq_db_user:NztrnGfV8ay2UJlv@cluster0.gfssdel.mongodb.net/"
+MONGODB_URI = os.getenv("MONGO_URI")
 DB_NAME = "emogo_db"
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
@@ -23,18 +24,15 @@ class Item(BaseModel):
 # -------------------------
 # Routes
 # -------------------------
-
 @app.get("/")
 async def root():
     return {"message": "Hello from FastAPI + MongoDB!"}
-
 
 @app.post("/items")
 async def create_item(item: Item):
     item_dict = item.dict()
     result = await db["items"].insert_one(item_dict)
     return {"inserted_id": str(result.inserted_id)}
-
 
 @app.get("/items")
 async def get_items():
@@ -44,7 +42,6 @@ async def get_items():
         document["_id"] = str(document["_id"])
         items.append(document)
     return items
-
 
 @app.get("/items/{item_id}")
 async def read_item(item_id: int):
